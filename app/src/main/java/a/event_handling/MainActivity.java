@@ -31,6 +31,17 @@ public class MainActivity extends AppCompatActivity {
         text_view_3 = findViewById(R.id.textView3);
         text_view_4 = findViewById(R.id.textView4);
         button = findViewById(R.id.button1);
+
+        //Обработчик короткого нажатия кнопки
+        button.setOnClickListener(view -> {
+            text_view_1.setText("Button clicked");
+        });
+
+        //Обработчик долгого нажатия кнопки
+        button.setOnLongClickListener(view -> {
+            text_view_1.setText("Long button clicked");
+            return true;
+        });
     }
 
     //Вызывается после выбора какого-либо пункта toolbar'а
