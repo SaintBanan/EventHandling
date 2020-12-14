@@ -3,8 +3,10 @@ package a.event_handling;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.GestureDetectorCompat;
 
 import android.os.Bundle;
+import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -12,11 +14,13 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity implements GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener
 {
     private ConstraintLayout main_layout;
     private TextView text_view_1, text_view_2, text_view_3, text_view_4;
     private Button button;
+
+    private GestureDetectorCompat gDetector;
 
     //Установить кастомный toolbar в меню
     @Override
@@ -41,6 +45,9 @@ public class MainActivity extends AppCompatActivity
 
         button = findViewById(R.id.button1);
 
+        gDetector = new GestureDetectorCompat(this, this);
+        gDetector.setOnDoubleTapListener(this);
+
         //Обработчик короткого нажатия кнопки
         button.setOnClickListener(view -> {
             text_view_1.setText("Button clicked");
@@ -51,14 +58,40 @@ public class MainActivity extends AppCompatActivity
             text_view_1.setText("Long button clicked");
             return true;
         });
-
-        //Обработчик касания экрана
-        main_layout.setOnTouchListener((view, event) -> {
-            handleTouch(event);
-            return true;
-        });
     }
 
+    //Вызывается после выбора какого-либо пункта toolbar'а
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        String action = item.getTitle().toString();
+
+        setTitle(action);
+
+        if ("ButtonClick".equals(action)) {
+            setVisibleElements(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE);
+        }
+        else if ("MotionEvent".equals(action)) {
+            setVisibleElements(View.INVISIBLE, View.VISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
+        }
+        else {
+            setVisibleElements(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    //Изменить видимость элементов в зависимости от выбранного действия
+    private void setVisibleElements(int text_view_1, int text_view_2, int text_view_3, int text_view_4, int button)
+    {
+        this.text_view_1.setVisibility(text_view_1);
+        this.text_view_2.setVisibility(text_view_2);
+        this.text_view_3.setVisibility(text_view_3);
+        this.text_view_4.setVisibility(text_view_4);
+        this.button.setVisibility(button);
+    }
+
+    ////Обработчик касания экрана
     private void handleTouch(MotionEvent event)
     {
         int ptr_count = event.getPointerCount();
@@ -99,34 +132,72 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    //Вызывается после выбора какого-либо пункта toolbar'а
     @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    public boolean onSingleTapConfirmed(MotionEvent e)
     {
-        String action = item.getTitle().toString();
-
-        setTitle(action);
-
-        if ("ButtonClick".equals(action)) {
-            setVisibleElements(View.VISIBLE, View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE);
-        }
-        else if ("MotionEvent".equals(action)) {
-            setVisibleElements(View.INVISIBLE, View.VISIBLE, View.VISIBLE, View.INVISIBLE, View.INVISIBLE);
-        }
-        else {
-            setVisibleElements(View.INVISIBLE, View.INVISIBLE, View.INVISIBLE, View.VISIBLE, View.INVISIBLE);
-        }
-
-        return super.onOptionsItemSelected(item);
+        text_view_4.setText("onSingleTapConfirmed");
+        return true;
     }
 
-    //Изменить видимость элементов в зависимости от выбранного действия
-    private void setVisibleElements(int text_view_1, int text_view_2, int text_view_3, int text_view_4, int button)
+    @Override
+    public boolean onDoubleTap(MotionEvent e)
     {
-        this.text_view_1.setVisibility(text_view_1);
-        this.text_view_2.setVisibility(text_view_2);
-        this.text_view_3.setVisibility(text_view_3);
-        this.text_view_4.setVisibility(text_view_4);
-        this.button.setVisibility(button);
+        text_view_4.setText("onDoubleTap");
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent e)
+    {
+        text_view_4.setText("onDoubleTapEvent");
+        return false;
+    }
+
+    @Override
+    public boolean onDown(MotionEvent e)
+    {
+        text_view_4.setText("onDown");
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent e)
+    {
+        text_view_4.setText("onShowPress");
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent e)
+    {
+        text_view_4.setText("onSingleTapUp");
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
+    {
+        text_view_4.setText("onScroll");
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e)
+    {
+        text_view_4.setText("onLongPress");
+    }
+
+    @Override
+    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY)
+    {
+        text_view_4.setText("onFling");
+        return false;
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        handleTouch(event);
+        gDetector.onTouchEvent(event);
+        return super.onTouchEvent(event);
     }
 }
